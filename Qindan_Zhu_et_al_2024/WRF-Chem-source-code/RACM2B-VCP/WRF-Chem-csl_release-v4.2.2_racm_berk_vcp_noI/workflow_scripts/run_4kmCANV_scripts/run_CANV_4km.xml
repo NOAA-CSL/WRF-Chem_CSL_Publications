@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE workflow [
+  <!ENTITY HOMEBASE_DIR "/home/Qindan.Zhu/">
+  <!ENTITY SCRIPTS "/home/Qindan.Zhu/sunvex-run-scripts/run_CONUS_fv19_BEIS_1.0xISO_RACM_v4.2.2_racm_berk_vcp_noI_phot_soa_siloxane_ivoc_nald_4km/">
+  <!ENTITY LOG_DIR "&SCRIPTS;Logs/">
+  <!ENTITY WRF_CHEM_ROOT "/scratch2/BMC/rcm1/qzhu/wrfchem/runs_sunvex/run_CONUS_fv19_BEIS_1.0xISO_RACM_v4.2.2_racm_berk_vcp_noI_phot_soa_siloxane_ivoc_nald_4km/">
+  <!ENTITY OUTPUT_DIR "&WRF_CHEM_ROOT;Output/">
+  <!ENTITY EMIS_DIR "/scratch2/BMC/rcm1/rhs/wrfchem/emissions/anthro/RACM2_BERK_VCP_version3/CA4km/2021/">
+  <!ENTITY BIOEMIS_DIR "/scratch2/BMC/rcm1/rhs/wrfchem/emissions/beis/season/">
+  <!ENTITY MET_DIR "/scratch2/BMC/rcm1/wrfchem_input/met_em/met1dom_CANV_hrrr_2021/">  
+  <!ENTITY MET4k_DIR "/scratch2/BMC/rcm1/qzhu/wrfchem/WPSV4.0_o3_d2/">
+  <!ENTITY MET12k_DIR "/scratch2/BMC/rcm1/qzhu/wrfchem/WPSV4.0_o3_d2/">
+  <!ENTITY CHEM12k_DIR "/scratch2/BMC/rcm1/qzhu/wrfchem/runs_sunvex/run_CONUS_fv19_BEIS_1.0xISO_RACM_v4.2.2_racm_berk_vcp_noI_phot_soa_siloxane_ivoc_nald/Output/">
+ 
+  <!ENTITY ACCOUNT "rcm1">
+  <!ENTITY QUEUE "batch">
+  <!ENTITY PARTITION "hera">
+  <!ENTITY EMAIL "Qindan.Zhu@noaa.gov">
+
+  <!ENTITY REAL_EXE_PROC "128">
+  <!ENTITY REAL_RUN_TIME "<walltime>00:55:00</walltime>">
+
+  <!ENTITY WRF_EXE_PROC "288">
+  <!ENTITY WRF_RUN_TIME "<walltime>08:00:00</walltime>">
+
+  <!ENTITY REAL_ID "1">
+  <!ENTITY NDOWN_ID "2">
+  <!ENTITY REAL2_ID "3">
+  <!ENTITY WRF_ID "4">
+  <!ENTITY RESERVATION '<queue>&QUEUE;</queue><account>&ACCOUNT;</account><partition>&PARTITION;</partition>'> 
+]>
+
+<!--WRF4.2.2 simulations on 4km resolution domain for SUNVEX field campaign-->
+
+<workflow realtime="F" scheduler="slurm" cyclethrottle="1">
+  <log verbosity="5">
+    <cyclestr>&LOG_DIR;sunvex_@Y@m@d@H.log</cyclestr>
+  </log>
+
+  <cycledef>202105250000 202106230000 01:00:00:00</cycledef>
+  <task name="real_nest" maxtries="3">
+    &REAL_RUN_TIME;
+    &RESERVATION;
+  <command>&SCRIPTS;run_CANV_4km_chem.sh</command>
+  <cores>&REAL_EXE_PROC;</cores>
+  <jobname><cyclestr>sunvex_real_@d</cyclestr></jobname>
+  <join><cyclestr>&LOG_DIR;sunvex_real_@Y@m@d@H.log</cyclestr></join>
+
+  <envar>
+    <name>START_TIME</name>
+      <value>
+        <cyclestr>@Y-@m-@d_@H</cyclestr>
+      </value>
+  </envar>
+
+  <envar>
+    <name>WRF_CHEM_ROOT</name>
+      <value>
+        &WRF_CHEM_ROOT;
+      </value>
+  </envar>
+
+  <envar>
+    <name>casedir</name>
+      <value>
+        &SCRIPTS;
+      </value>
+  </envar>
+
+  <envar>
+    <name>path_out</name>
+      <value>
+        &OUTPUT_DIR;
+      </value>
+  </envar>
+
+  <envar>
+    <name>metdir</name>
+      <value>
+        &MET_DIR;
+      </value>
+  </envar>
+
+  <envar>
+    <name>met4kdir</name>
+      <value>
+        &MET4k_DIR;
+      </value>
+  </envar>
+
+  <envar>
+    <name>met12kdir</name>
+      <value>
+        &MET12k_DIR;
+      </value>
+  </envar>
+
+  <envar>
+    <name>bioemisdir</name>
+      <value>
+        &BIOEMIS_DIR;
+      </value>
+  </envar>
+
+  <envar>
+    <name>task_no</name>
+      <value>
+        &REAL_ID;
+      </value>
+  </envar>
+
+</task>
+  <task name="ndown_4km" maxtries="3">
+    &REAL_RUN_TIME;
+    &RESERVATION;
+  <command>&SCRIPTS;run_CANV_4km_chem.sh</command>
+  <cores>&REAL_EXE_PROC;</cores>
+  <jobname><cyclestr>sunvex_ndown_@d</cyclestr></jobname>
+  <join><cyclestr>&LOG_DIR;sunvex_ndown_@Y@m@d@H.log</cyclestr></join>
+
+  <envar>
+    <name>START_TIME</name>
+      <value>
+        <cyclestr>@Y-@m-@d_@H</cyclestr>
+      </value>
+  </envar>
+
+  <envar>
+    <name>WRF_CHEM_ROOT</name>
+      <value>
+        &WRF_CHEM_ROOT;
+      </value>
+  </envar>
+
+  <envar>
+    <name>casedir</name>
+      <value>
+        &SCRIPTS;
+      </value>
+  </envar>
+
+  <envar>
+    <name>task_no</name>
+      <value>
+        &NDOWN_ID;
+      </value>
+  </envar>
+
+  <envar>
+      <name>emisdir</name>
+      <value>
+          &EMIS_DIR;
+      </value>
+  </envar>
+
+  <envar>
+    <name>bioemisdir</name>
+      <value>
+        &BIOEMIS_DIR;
+      </value>
+  </envar>
+
+  <envar>
+    <name>met4kdir</name>
+      <value>
+        &MET4k_DIR;
+      </value>
+  </envar>
+
+  <envar>
+    <name>chem12kdir</name>
+      <value>
+        &CHEM12k_DIR;
+      </value>
+  </envar>
+
+  <dependency>
+    <taskdep task="real_nest"/>
+  </dependency>
+
+</task>
+  <task name="real_4km" maxtries="3">
+    &REAL_RUN_TIME;
+    &RESERVATION;
+  <command>&SCRIPTS;run_CANV_4km_chem.sh</command>
+  <cores>&REAL_EXE_PROC;</cores>
+  <jobname><cyclestr>sunvex_real2_@d</cyclestr></jobname>
+  <join><cyclestr>&LOG_DIR;sunvex_real2_@Y@m@d@H.log</cyclestr></join>
+
+  <envar>
+    <name>START_TIME</name>
+      <value>
+        <cyclestr>@Y-@m-@d_@H</cyclestr>
+      </value>
+  </envar>
+
+  <envar>
+    <name>WRF_CHEM_ROOT</name>
+      <value>
+        &WRF_CHEM_ROOT;
+      </value>
+  </envar>
+
+  <envar>
+    <name>casedir</name>
+      <value>
+        &SCRIPTS;
+      </value>
+  </envar>
+
+  <envar>
+    <name>path_out</name>
+      <value>
+        &OUTPUT_DIR;
+      </value>
+  </envar>
+
+  <envar>
+    <name>metdir</name>
+      <value>
+        &MET_DIR;
+      </value>
+  </envar>
+
+  <envar>
+    <name>met4kdir</name>
+      <value>
+        &MET4k_DIR;
+      </value>
+  </envar>
+
+  <envar>
+    <name>met12kdir</name>
+      <value>
+        &MET12k_DIR;
+      </value>
+  </envar>
+
+  <envar>
+    <name>bioemisdir</name>
+      <value>
+        &BIOEMIS_DIR;
+      </value>
+  </envar>
+
+  <envar>
+    <name>task_no</name>
+      <value>
+        &REAL2_ID;
+      </value>
+  </envar>
+
+  <dependency>
+    <and>
+      <taskdep task="real_nest"/>
+      <taskdep task="ndown_4km"/>
+    </and>
+  </dependency>
+
+</task>
+<task name="wrfchem_4km" maxtries="3">
+    &WRF_RUN_TIME;
+    &RESERVATION;
+    
+  <command>&SCRIPTS;run_CANV_4km_chem.sh</command>
+  <cores>&WRF_EXE_PROC;</cores>
+  <jobname><cyclestr>sunvex_wrf_@d</cyclestr></jobname>
+  <join>
+      <cyclestr>&LOG_DIR;sunvex_wrf_@Y@m@d@H.log</cyclestr>
+  </join>
+  
+  <envar>
+    <name>START_TIME</name>
+      <value>
+        <cyclestr>@Y-@m-@d_@H</cyclestr>
+      </value>
+  </envar>
+  
+  <envar>
+    <name>WRF_CHEM_ROOT</name>
+      <value>
+        &WRF_CHEM_ROOT;
+      </value>
+  </envar>
+  
+  <envar>
+    <name>casedir</name>
+      <value>
+        &SCRIPTS;
+      </value>
+  </envar>
+
+  <envar>
+    <name>path_out</name>
+      <value>
+        &OUTPUT_DIR;
+      </value>
+  </envar>
+
+  <envar>
+    <name>metdir</name>
+      <value>
+        &MET_DIR;
+      </value>
+  </envar>
+
+  <envar>
+    <name>bioemisdir</name>
+      <value>
+        &BIOEMIS_DIR;
+      </value>
+  </envar>
+
+  <envar>
+    <name>emisdir</name>
+      <value>
+        &EMIS_DIR;
+      </value>
+  </envar>
+  
+  <envar>
+    <name>task_no</name>
+      <value>
+        &WRF_ID;
+      </value>
+  </envar>
+  
+  <dependency>
+    <and>
+      <taskdep task="real_nest"/>
+      <taskdep task="ndown_4km"/>
+      <taskdep task="real_4km"/>
+    </and>
+  </dependency>
+  
+</task>
+</workflow>
